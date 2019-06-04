@@ -1,5 +1,6 @@
 package project.util;
 
+
 public class Point {
 
 	public static final Point x_1y_1 = new Point(-1, -1);

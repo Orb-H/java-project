@@ -51,6 +51,10 @@ public class Player {
                 System.out.println("You cannot remove 0: The Fool card");
                 return 2;
             }
+            if(removedCard[i]>24 || removedCard[i]<0){
+                System.out.println("Array out of Bound");
+                return 3;
+            }
             if(!hand[removedCard[i]]) {
                 System.out.println("Invalid Card Number!");
                 return 1;

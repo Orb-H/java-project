@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import project.AI.*;
 import project.cards.*;
 import project.ranking.Ranking;
 import project.ranking.Score1v1;
@@ -125,8 +126,8 @@ public class GameSystem {
 		cards.add(new AttackCard("XX: Judgement", 20, new String[] {}, "Damage to entities in shape 工 around player", 20, 30,
 				new Point[] {Point.x_1y_1, Point.x0y_1, Point.x1y_1, Point.x0y0, Point.x_1y1, Point.x0y1, Point.x1y1}));
 		cards.add(new SpecialCard("XXI: The World", 21, new String [] {}, "Attack entire map", 15, 60));
-		cards.add(new MoveCard("Left dash", 22,new String[] {}, "Move two cells leftward"));// 28
-		cards.add(new MoveCard("Right dash", 23, new String[] {}, "Move two cells rightward"));// 29
+		cards.add(new MoveCard("XXII: Left dash", 22,new String[] {}, "Move two cells leftward"));// 28
+		cards.add(new MoveCard("XXIII: Right dash", 23, new String[] {}, "Move two cells rightward"));// 29
 	}
 
 	public String getInput(String s) {
@@ -136,18 +137,28 @@ public class GameSystem {
 
 	public static void main(String[] args) {
 		GameSystem gs = GameSystem.getInstance();
-		Scanner scan=new Scanner(System.in);
 
+		//for testing ai
+		Scanner scan=new Scanner(System.in);
 		Player player=new Player(1,0);
+		Player ai=new Player(1, 3);
+		int[] playerOP, aiOP;
 		player.show(gs.getCardList());
 		System.out.println("mulligan? true/false");
 		boolean b=scan.nextBoolean();
 		if(b){
 			while(player.mulligan()!=0);
-			System.out.println("After Mulligan");
+			System.out.println("Result of Mulligan");
 			player.show(gs.getCardList());
+			System.out.println();
 		}
-
+		for(int i=0;i<5;++i){
+			PlayerProcess PlayerDecision = new PlayerProcess(player);
+			AIProcess AIDecision = new AIProcess(ai);
+			playerOP = PlayerDecision.call();
+			aiOP = AIDecision.call();
+			System.out.printf("Player : %d %d %d\n", playerOP[0], playerOP[1], playerOP[2]);
+			System.out.printf("AI : %d %d %d\n", aiOP[0], aiOP[1], aiOP[2]);
+		}
 	}
-
 }
