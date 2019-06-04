@@ -1,10 +1,11 @@
-package project.AI;
+package project.system;
 
-import project.system.Player;
+import java.util.Random;
 
 import java.util.concurrent.Callable;
 
 public class AIProcess implements  Callable<int[]>{
+    ProcessLock Lock;
     Player ai;
     boolean[] predictedDeck=new boolean[24];
     public AIProcess(Player p){
@@ -15,7 +16,13 @@ public class AIProcess implements  Callable<int[]>{
         ai=p;
         predictedDeck=arr_b;
     }
+
     public int[] call(){
-        return new int[] {1, 2, 3};
+        //busy waiting
+        while(Lock.checkAILock());
+        Random gen=new Random();
+        int a=gen.nextInt(24), b=gen.nextInt(24), c=gen.nextInt(24);
+        Lock.EndAITurn();
+        return new int[] {a, b, c};
     }
 }
