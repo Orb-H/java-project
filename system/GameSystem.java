@@ -3,6 +3,8 @@ package project.system;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import project.cards.*;
 import project.ranking.Ranking;
@@ -143,18 +145,17 @@ public class GameSystem {
     public static void main(String[] args) {
         GameSystem gs = GameSystem.getInstance();
 
-        //for testing System applications
-        Scanner scan = new Scanner(System.in);
+        //Example of 1vs1 mod with stage 1
         Player player = new Player(1, 0);
-        Player ai = new Player(1, 3);
+        AI ai = new AI(1, 3);
         ProcessLock sharedLock = new ProcessLock();
         int[] playerOP, aiOP;
+        int stage = 1;
 
         //test for getCardFromDeck and Mulligan, show player's hand methods
         player.show(gs.getCardList());
-        System.out.println("mulligan? true/false");
-        boolean b = scan.nextBoolean();
-        if (b) {
+        String b = GameSystem.gs.getInput("mulligan true/false");
+        if (b.equals("true") || b.equals("True") || b.equals("TRUE") || b.equals("t") || b.equals("T")) {
             while (player.mulligan() != 0) ;
             System.out.println("Result of Mulligan");
             player.show(gs.getCardList());
