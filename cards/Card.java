@@ -38,6 +38,10 @@ public abstract class Card {
         return cost;
     }
 
+    public int getDeal(){
+        return deal;
+    }
+    public abstract boolean inBound(int dy, int dx);
     public abstract void act();
 
 }

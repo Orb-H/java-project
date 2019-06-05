@@ -8,6 +8,10 @@ public class MoveCard extends Card {
 		super(CardType.MOVE, name, num, ascii, description, 0, 0);
 	}
 
+	public boolean inBound(int dy, int dx){
+		return true;
+	}
+
 	@Override
 	public void act() {
 

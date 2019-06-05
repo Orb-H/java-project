@@ -9,6 +9,10 @@ public class ShieldCard extends Card {
 		super(CardType.SHIELD, name, num, ascii, description, deal, cost);
 	}
 
+	public boolean inBound(int dy, int dx) {
+		return true;
+	}
+
 	@Override
 	public void act() {
 

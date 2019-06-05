@@ -2,10 +2,13 @@ package project.system;
 
 import java.util.concurrent.Callable;
 import java.util.Scanner;
+import java.util.List;
+import project.cards.*;
 
 public class PlayerProcess implements Callable<int[]> {
     ProcessLock Lock;
     Player player;
+    List<Card> cardList=GameSystem.gs.getCardList();
 
     public PlayerProcess(Player player) {
         this.player = player;
@@ -17,6 +20,7 @@ public class PlayerProcess implements Callable<int[]> {
         Scanner scanner = new Scanner(System.in);
         boolean done = false;
         int[] op = new int[3];
+        int estimate_cost;
         String input;
         String[] op_string;
 
@@ -24,10 +28,11 @@ public class PlayerProcess implements Callable<int[]> {
         player.show(GameSystem.gs.getCardList());
         System.out.println("Left -> L, Right -> R, Up -> U, Down -> D, Guard -> G, Charge -> C");
         do {
+            estimate_cost=0;
             System.out.print("Choose order of Cards ; ");
             input = scanner.nextLine();
             op_string = input.split(" ");
-            if (op_string.length > 3) {
+            if (op_string.length != 3) {
                 System.out.println("Wrong Length of Cards\n");
                 continue;
             }
@@ -52,6 +57,7 @@ public class PlayerProcess implements Callable<int[]> {
                     try {
                         if (player.hand[op[i]]) {
                             op[i] += 6;
+                            estimate_cost+=cardList.get(op[i]).getCost();
                         } else {
                             System.out.println("Not in your hand error");
                             break;
@@ -61,7 +67,13 @@ public class PlayerProcess implements Callable<int[]> {
                         break;
                     }
                 }
-                if (i == 2) done = true;
+                if (i == 2){
+                    if(estimate_cost>player.mp){
+                        System.out.println("Not enough mp");
+                        break;
+                    }
+                    else done=true;
+                }
             }
         } while (!done);
         Lock.EndPlayerTurn();

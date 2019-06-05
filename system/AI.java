@@ -46,8 +46,10 @@ public class AI extends Player {
 
     public void mulligan(int[] removedCard) {
         int t = 0;
-        for (int i = 0; i < removedCard.length; ++i)
+        for (int i = 0; i < removedCard.length; ++i) {
             if (hand[removedCard[i]]) ++t;
+            else hand[removedCard[i]]=true;
+        }
         getCardFromDeck(t);
         for (int i = 0; i < removedCard.length; ++i)
             hand[removedCard[i]] = false;

@@ -147,7 +147,7 @@ public class GameSystem {
 
         //Example of 1vs1 mod with stage 1
         Player player = new Player(1, 0);
-        AI ai = new AI(1, 3);
+        AI ai = new AI(1, 1);
         ProcessLock sharedLock = new ProcessLock();
         int[] playerOP, aiOP;
         int stage = 1;
@@ -162,12 +162,14 @@ public class GameSystem {
             System.out.println();
         }
 
+        List<Card> t=GameSystem.gs.getCardList();
         //Test for turn playing
         while (player.hp != 0 && ai.hp != 0) {
             PlayerProcess PlayerDecision = new PlayerProcess(player);
             PlayerDecision.Lock = sharedLock;
             AIProcess AIDecision = new AIProcess(ai);
             AIDecision.Lock = sharedLock;
+            AIDecision.cardList=GameSystem.gs.getCardList();
             playerOP = PlayerDecision.call();
             aiOP = AIDecision.call();
             //Player's card operation
