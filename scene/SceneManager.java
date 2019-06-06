@@ -24,7 +24,6 @@ public class SceneManager {
 
 	public void loadScene(String name) {
 		current = scenes.get(name);
-		clearScreen();
 		current.repaint();
 		current.onLoad();
 	}
@@ -35,6 +34,11 @@ public class SceneManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void repaint() {
+		clearScreen();
+		current.render();
 	}
 
 }

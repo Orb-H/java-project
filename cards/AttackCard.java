@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import project.util.Point;
+import project.system.GameSystem;
 
 public class AttackCard extends Card {
 
@@ -19,8 +20,25 @@ public class AttackCard extends Card {
     }
 
     @Override
-    public void act() {
-
+    public void act(int caster) {
+        int dmg;
+        if (caster == 1) {
+            if (inBound(GameSystem.player.y - GameSystem.ai.y, GameSystem.player.x - GameSystem.ai.x)) {
+                dmg = deal + GameSystem.player.shield;
+                GameSystem.player.hp -= dmg > 0 ? dmg : 0;
+                GameSystem.player.cnt_def++;
+            }
+            GameSystem.ai.mp -= cost;
+            GameSystem.ai.cnt_atk++;
+        } else {
+            if (inBound(GameSystem.ai.y - GameSystem.player.y, GameSystem.ai.x - GameSystem.player.x)) {
+                dmg = deal + GameSystem.ai.shield;
+                GameSystem.ai.hp -= dmg > 0 ? dmg : 0;
+                GameSystem.ai.cnt_def++;
+            }
+            GameSystem.player.mp -= cost;
+            GameSystem.player.cnt_atk++;
+        }
     }
 
 }

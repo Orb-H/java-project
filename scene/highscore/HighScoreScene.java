@@ -1,11 +1,21 @@
 package project.scene.highscore;
 
+import project.ranking.Ranking;
+import project.scene.Component;
+import project.scene.DynamicComponent;
 import project.scene.Scene;
 import project.scene.StaticComponent;
+import project.system.GameSystem;
 
 public class HighScoreScene extends Scene {
 
 	private static HighScoreScene hss;
+
+	Component mode1;
+	Component mode2;
+	Component score;
+
+	boolean mode = false;
 
 	public static HighScoreScene getInstance() {
 		if (hss == null)
@@ -24,7 +34,44 @@ public class HighScoreScene extends Scene {
 				"        `8b Y8,          Y8,        ,8P 88    `8b   88             88      `8b Y8,        ,8P d8\"\"\"\"\"\"\"\"8b   88    `8b   88         8P",
 				"Y8a     a8P  Y8a.    .a8  Y8a.    .a8P  88     `8b  88             88      a8P  Y8a.    .a8P d8'        `8b  88     `8b  88      .a8P ",
 				" \"Y88888P\"    `\"Y8888Y\"'   `\"Y8888Y\"'   88      `8b 88888888888    88888888P\"    `\"Y8888Y\"' d8'          `8b 88      `8b 88888888Y\"'  " }));
-		// addComponent(new DynamicComponent());
+		mode1 = new StaticComponent(60, 11, 26, 6,
+				new String[] { " __  __      _______   __ ", "/_ | \\ \\    / / ____| /_ |",
+						" | |  \\ \\  / / (___    | |", " | |   \\ \\/ / \\___ \\   | |", " | |    \\  /  ____) |  | |",
+						" |_|     \\/  |_____/   |_|" });
+		mode2 = new StaticComponent(58, 11, 30, 6,
+				new String[] { " ___   __      _______   ___  ", "|__ \\  \\ \\    / / ____| |__ \\ ",
+						"   ) |  \\ \\  / / (___      ) |", "  / /    \\ \\/ / \\___ \\    / / ",
+						" / /_     \\  /  ____) |  / /_ ", "|____|     \\/  |_____/  |____|" });
+		score = new DynamicComponent(56, 21, 45, 21);
+
+		loadScore();
+
+		addComponent(mode1);
+		addComponent(score);
+	}
+
+	public void setMode(boolean b) {// false for 1v1, true for 2v2
+		if (b ^ mode) {
+			mode = b;
+			if (b) {
+				deleteComponent(mode1);
+				addComponent(mode2);
+			} else {
+				deleteComponent(mode2);
+				addComponent(mode1);
+			}
+			loadScore();
+		}
+	}
+
+	protected void onLoad() {
+		gs.getInput("Press Enter to return to main menu");
+		sm.loadScene("title");
+	}
+
+	public void loadScore() {
+		Ranking r = gs.getRanking(mode);
+		score.setRender(score.getSize().getX(), score.getSize().getY(), r.format());
 	}
 
 }

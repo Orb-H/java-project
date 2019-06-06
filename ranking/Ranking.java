@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,7 +17,7 @@ public class Ranking<T> {
 
 	File f;
 	HashMap<String, Score<T>> score = new HashMap<>();
-	boolean ascending = true;
+	boolean ascending = false;
 	String name;
 	Class<? extends Score<T>> cl;
 
@@ -56,13 +57,19 @@ public class Ranking<T> {
 		score.put(name, point);
 	}
 
-	public void saveIfHigher(String name, Score<T> point) {
-		if (score.containsKey(name)) {
-			if (score.get(name).compare(point) < 0) {
-				save(name, point);
-			}
-		} else
-			save(name, point);
+	public void saveIfHigher(String name, T point) {
+		try {
+			Score s = cl.getDeclaredConstructor(point.getClass()).newInstance(point);
+			if (score.containsKey(name)) {
+				if (score.get(name).compare(s) < 0) {
+					save(name, s);
+				}
+			} else
+				save(name, s);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	Comparator<Entry<String, Score<T>>> c = new Comparator<Entry<String, Score<T>>>() {
@@ -74,8 +81,8 @@ public class Ranking<T> {
 
 	};
 
-	public void onDisable() {
-		Stream<Entry<String, Score<T>>> stream = score.entrySet().stream().sorted(c);
+	public void store() {
+		Stream<Entry<String, Score<T>>> stream = getScore();
 		try {
 			PrintWriter pw = new PrintWriter(new FileWriter(f));
 			Iterator<Entry<String, Score<T>>> ite = stream.iterator();
@@ -91,8 +98,34 @@ public class Ranking<T> {
 		}
 	}
 
-	public String format() {
-		return "";
+	public void onDisable() {
+		store();
+	}
+
+	public Stream<Entry<String, Score<T>>> getScore() {
+		return score.entrySet().stream().sorted(c);
+	}
+
+	public String[] format() {
+		Iterator<Entry<String, Score<T>>> it = getScore().iterator();
+		Entry<String, Score<T>> cur;
+		String[] s = new String[21];
+		s[0] = "RANKING      NAME        SCORE     ";
+		for (int i = 1; i <= 10; i++) {
+			cur = it.hasNext() ? it.next() : null;
+			s[2 * i - 1] = "  " + lengthen(i + "", 2) + "        " + lengthen(cur != null ? cur.getKey() : "", 6)
+					+ "     " + (cur != null ? String.format("%9.3f", cur.getValue().value) : "         ") + "   ";
+			s[2 * i] = "-----------------------------------";
+		}
+		return s;
+
+	}
+
+	public String lengthen(String s, int len) {
+		while (s.length() < len) {
+			s = " " + s;
+		}
+		return s;
 	}
 
 }

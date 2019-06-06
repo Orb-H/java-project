@@ -4,27 +4,18 @@ import project.util.StringUtils;
 import project.cards.Card;
 
 import java.util.Random;
-import java.util.List;
+
 
 public class Player {
-    int x, y, hp, mp;
-    boolean is2v2;
+    public int x, y, hp, mp, shield;
+    public int cnt_atk = 0, cnt_def = 0;
     boolean[] hand = new boolean[24];
 
     Player(int sy, int sx) {
         for (int i = 0; i < 24; ++i) hand[i] = false;
-        is2v2 = false;
         x = sx;
         y = sy;
         hp = mp = 100;
-        getCardFromDeck(4);
-    }
-
-    Player(int sy, int sx, boolean mod){
-        is2v2=mod;
-        y=sy;
-        x=sx;
-        hp=mp=100;
         getCardFromDeck(4);
     }
 
@@ -36,13 +27,21 @@ public class Player {
                 drawCard = gen.nextInt(24);
             } while (hand[drawCard]);
             if (drawCard == 4 || drawCard == 6 || drawCard == 8 || drawCard == 16 || drawCard == 18) {
-                if (is2v2)
+                if (GameSystem.mode)
                     hand[drawCard] = true;
                 else
                     --i;
             } else
                 hand[drawCard] = true;
         }
+    }
+
+    public double calcavgCost() {
+        double cost = 0;
+        for (int i = 0; i < 24; ++i) {
+            if (hand[i]) cost += Card.cards.get(i + 6).getCost();
+        }
+        return cost / 4;
     }
 
     public int mulligan() {
@@ -76,11 +75,11 @@ public class Player {
         return 0;
     }
 
-    public void show(List<Card> cards) {
+    public void show() {
         System.out.println("Your Hand is");
         for (int i = 0; i < 24; ++i) {
             if (hand[i]) {
-                System.out.println(cards.get(i + 6).getName());
+                System.out.println(Card.cards.get(i + 6).getName());
             }
         }
     }

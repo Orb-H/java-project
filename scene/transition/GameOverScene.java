@@ -1,20 +1,19 @@
-package project.scene.ending;
+package project.scene.transition;
 
 import project.scene.Scene;
 import project.scene.StaticComponent;
 
-public class EndingScene extends Scene {
+public class GameOverScene extends Scene {
 
-	private static EndingScene es;
+	private static GameOverScene gos;
 
-	public static EndingScene getInstance() {
-		if (es == null)
-			es = new EndingScene();
-		return es;
+	public static GameOverScene getInstance() {
+		if (gos == null)
+			gos = new GameOverScene();
+		return gos;
 	}
 
-	private EndingScene() {
-		super();
+	private GameOverScene() {
 		addComponent(new StaticComponent(39, 11, 59, 18,
 				new String[] { "  ,ad8888ba,        db        88b           d88 88888888888",
 						" d8\"'    `\"8b      d88b       888b         d888 88         ",
@@ -34,6 +33,11 @@ public class EndingScene extends Scene {
 						"    Y8,        ,8P    `8b d8'     88          88    `8b    ",
 						"     Y8a.    .a8P      `888'      88          88     `8b   ",
 						"      `\"Y8888Y\"'        `8'       88888888888 88      `8b  " }));
+	}
+
+	protected void onLoad() {
+		getInput("Press Enter to return to main menu");
+		sm.loadScene("title");
 	}
 
 }

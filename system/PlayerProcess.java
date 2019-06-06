@@ -2,17 +2,10 @@ package project.system;
 
 import java.util.concurrent.Callable;
 import java.util.Scanner;
-import java.util.List;
 import project.cards.*;
 
 public class PlayerProcess implements Callable<int[]> {
     ProcessLock Lock;
-    Player player;
-    List<Card> cardList=GameSystem.gs.getCardList();
-
-    public PlayerProcess(Player player) {
-        this.player = player;
-    }
 
     public int[] call() {
         //busy waiting
@@ -25,7 +18,7 @@ public class PlayerProcess implements Callable<int[]> {
         String[] op_string;
 
         //Show current hand
-        player.show(GameSystem.gs.getCardList());
+        GameSystem.player.show();
         System.out.println("Left -> L, Right -> R, Up -> U, Down -> D, Guard -> G, Charge -> C");
         do {
             estimate_cost=0;
@@ -46,7 +39,10 @@ public class PlayerProcess implements Callable<int[]> {
                 else if (op_string[i].equals("U") || op_string[i].equals("u")) op[i] = 2;
                 else if (op_string[i].equals("D") || op_string[i].equals("d")) op[i] = 3;
                 else if (op_string[i].equals("G") || op_string[i].equals("g")) op[i] = 4;
-                else if (op_string[i].equals("C") || op_string[i].equals("c")) op[i] = 5;
+                else if (op_string[i].equals("C") || op_string[i].equals("c")){
+                    op[i] = 5;
+                    estimate_cost-=15;
+                }
                 else {
                     try {
                         op[i] = Integer.parseInt(op_string[i]);
@@ -55,9 +51,9 @@ public class PlayerProcess implements Callable<int[]> {
                         break;
                     }
                     try {
-                        if (player.hand[op[i]]) {
+                        if (GameSystem.player.hand[op[i]]) {
                             op[i] += 6;
-                            estimate_cost+=cardList.get(op[i]).getCost();
+                            estimate_cost+=Card.cards.get(op[i]).getCost();
                         } else {
                             System.out.println("Not in your hand error");
                             break;
@@ -68,7 +64,7 @@ public class PlayerProcess implements Callable<int[]> {
                     }
                 }
                 if (i == 2){
-                    if(estimate_cost>player.mp){
+                    if(estimate_cost>GameSystem.player.mp){
                         System.out.println("Not enough mp");
                         break;
                     }

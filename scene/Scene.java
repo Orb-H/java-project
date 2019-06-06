@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.system.GameSystem;
+import project.util.StringUtils;
 
 public abstract class Scene {
 
 	protected List<Component> components = new ArrayList<>();
 	protected char[][] toRender;
 	protected SceneManager sm;
-	protected GameSystem gs = GameSystem.gs;
+	protected GameSystem gs;
 
 	protected Scene() {
 		sm = SceneManager.getInstance();
+		gs = GameSystem.getInstance();
 		toRender = new char[50][140];
 		addComponent(new BorderComponent(0, 0, 140, 50));
 	}
@@ -27,6 +29,10 @@ public abstract class Scene {
 
 	public void addComponent(Component c) {
 		components.add(c);
+	}
+
+	public void deleteComponent(Component c) {
+		components.remove(c);
 	}
 
 	public void repaint() {

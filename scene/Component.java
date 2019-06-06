@@ -38,4 +38,12 @@ public abstract class Component {
 		}
 	}
 
+	public Point getLoc() {
+		return loc;
+	}
+
+	public Point getSize() {
+		return size;
+	}
+
 }
