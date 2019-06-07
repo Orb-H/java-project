@@ -78,11 +78,10 @@ public class AIProcess implements Callable<int[]> {
     }
 
     protected int[] Stage3AI() {
+        double averageCost=ai.calcavgCost();
         int predict1 = 0, predict2 = 0, benefit;
         int[][] op1 = {{0}, null}, op2 = {{0}, null};
         ai.mulligan(new int[]{6});
-        if (ai.mp < ai.calcavgCost())
-            return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
         if (ply[0].hp > 0) {
             predict1 = PredictMaxDmg(ply[0].hand, 0);
             op1 = CalcMaxDmg(ply[0].y, ply[0].x);
@@ -93,9 +92,8 @@ public class AIProcess implements Callable<int[]> {
         }
         benefit = op1[0][0] - predict1;
         if (GameSystem.mode) benefit = benefit + op2[0][0] - predict2;
-        if (benefit < 0) return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
-
-        if (op1[0][0] == 0 && op2[0][0] == 0 && ai.mp > 80) return Close(ai.hand[22], ai.hand[23]);
+        if (benefit < -20 && ai.mp < averageCost) return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
+        if (op1[0][0]==0 && op2[0][0]==0 && ai.mp > 80) return Close(ai.hand[22], ai.hand[23]);
 
         if (op1[0][0] > op2[0][0]) {
             return (op1[1] != null) ? op1[1] : Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
@@ -323,7 +321,7 @@ public class AIProcess implements Callable<int[]> {
                 }
             }
         }
-        if (used[r - 1][col - 1].equals("")) return new int[][] {{0}, null};
+        if (used[r - 1][col - 1].equals("")) return new int[][]{{0}, null};
         int[] temp = StringUtils.Split2Int(used[r - 1][col - 1], " ");
         for (int i = 0; i < temp.length; ++i) op[i] = temp[i];
         if (op[1] == 0) {

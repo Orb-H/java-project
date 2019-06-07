@@ -49,6 +49,7 @@ public class Player {
         String b = GameSystem.gs.getInput("mulligan true/false : ");
         if (b.equals("true") || b.equals("True") || b.equals("TRUE") || b.equals("t") || b.equals("T")) {
             do {
+                errCode=0;
                 String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
                 int[] removedCard = StringUtils.Split2Int(inputStr, " ");
                 //Verifying removed card list

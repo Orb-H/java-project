@@ -135,10 +135,16 @@ public class GameSystem {
             gs.showStatus(turn++);
             System.out.println();
         }
-
-        if (gs.player1.hp <= 0 && gs.player2.hp <= 0) System.out.println("AI WIN");
-        else if (gs.ai1.hp <= 0 && gs.ai2.hp <= 0) System.out.println("Player WIN");
-        else System.out.println("Draw..");
+        if(mode) {
+            if (gs.player1.hp <= 0 && gs.player2.hp <= 0) System.out.println("AI WIN");
+            else if (gs.ai1.hp <= 0 && gs.ai2.hp <= 0) System.out.println("Player WIN");
+            else System.out.println("Draw..");
+        }
+        else{
+            if(gs.player1.hp<=0) System.out.println("AI WIN");
+            else if(gs.ai1.hp<=0) System.out.println("Player WIN");
+            else System.out.println("Draw..");
+        }
     }
 
     public void play_turn(int[][] pOP) {
