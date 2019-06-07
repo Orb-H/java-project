@@ -53,7 +53,7 @@ public abstract class Card {
                         Point.x1y0, Point.x1y1})); // 7
         cards.add(new AttackCard("II: The High Priestess", 2, new String[]{},
                 "Damages to entities in short cross(length 1) around player", 25, 30,
-                new Point[]{Point.x_1y0, Point.x1y1, Point.x0y_1, Point.x0y1, Point.x0y0})); // 8
+                new Point[]{Point.x_1y0, Point.x1y0, Point.x0y_1, Point.x0y1, Point.x0y0})); // 8
         cards.add(new AttackCard("III: The Empress", 3, new String[]{},
                 "Damages to entities in short X-shaped range(length 1) around player", 25, 30,
                 new Point[]{Point.x_1y_1, Point.x_1y1, Point.x1y_1, Point.x1y1, Point.x0y0})); // 9
