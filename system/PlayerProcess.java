@@ -42,6 +42,10 @@ public class PlayerProcess implements Callable<int[]> {
                 System.out.println("Cards can use only one time per turn");
                 continue;
             }
+            for(int i=0;i<3;++i) if(op_string[i].equals("0")){
+                System.out.println("Cannot choose FOOL CARD");
+                continue;
+            }
             for (int i = 0; i < 3; ++i) {
                 if (op_string[i].equals("L") || op_string[i].equals("l")) op[i] = 0;
                 else if (op_string[i].equals("R") || op_string[i].equals("r")) op[i] = 1;

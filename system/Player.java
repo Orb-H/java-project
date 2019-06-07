@@ -52,7 +52,10 @@ public class Player {
                 errCode=0;
                 String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
                 int[] removedCard = StringUtils.Split2Int(inputStr, " ");
-                if(removedCard==null) continue;
+                if(removedCard==null) {
+                    errCode=5;
+                    continue;
+                }
                 //Verifying removed card list
                 for (int i = 0; i < removedCard.length - 1; ++i)
                     for (int j = i + 1; j < removedCard.length; ++j)

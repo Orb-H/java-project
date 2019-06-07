@@ -78,7 +78,7 @@ public class AIProcess implements Callable<int[]> {
     }
 
     protected int[] Stage3AI() {
-        double averageCost=ai.calcavgCost();
+        double averageCost = ai.calcavgCost();
         int predict1 = 0, predict2 = 0, benefit;
         int[][] op1 = {{0}, null}, op2 = {{0}, null};
         ai.mulligan(new int[]{6});
@@ -91,9 +91,13 @@ public class AIProcess implements Callable<int[]> {
             predict2 = PredictMaxDmg(ply[1].hand, 1);
         }
         benefit = op1[0][0] - predict1;
-        if (GameSystem.mode) benefit = benefit + op2[0][0] - predict2;
+        try {
+            if (GameSystem.mode) benefit = benefit + op2[0][0] - predict2;
+        } catch (NullPointerException ex) {
+            benefit = benefit - predict2;
+        }
         if (benefit < -20 && ai.mp < averageCost) return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
-        if (op1[0][0]==0 && op2[0][0]==0 && ai.mp > 80) return Close(ai.hand[22], ai.hand[23]);
+        if (op1[0][0] == 0 && op2[0][0] == 0 && ai.mp > 80) return Close(ai.hand[22], ai.hand[23]);
 
         if (op1[0][0] > op2[0][0]) {
             return (op1[1] != null) ? op1[1] : Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
@@ -194,7 +198,7 @@ public class AIProcess implements Callable<int[]> {
         }
 
         if (dist == 0) {
-            return new int[] {4, 5, (int)(chance*4)};
+            return new int[]{4, 5, (int) (chance * 4)};
         }
         if (dist == 1) {
             if (dy == 0) {

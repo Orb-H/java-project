@@ -77,42 +77,54 @@ public class GameSystem {
     public static void main(String[] args) {
         GameSystem gs = GameSystem.getInstance();
         //gs.onEnable();
+        //모드 입력
         String temp = gs.getInput("is 2v2 mode ? : ");
+        //모드 설정
         if (temp.equals("true") || temp.equals("t")) mode = true;
-        //Example of 1vs1 mod with stage 1
+        //ai와 player 객체 생성 기본 설정 3스테이지
         gs.player1 = new Player(1, 0);
         gs.ai1 = new AI(1, (mode ? 4 : 3), 3);
+        //2대2 모드면 객체 2개 더 생성
         if (mode) {
             gs.player2 = new Player(3, 0);
             gs.ai2 = new AI(3, 4, 3);
         }
-
+        //플레이어와 ai결정이 같이 끝나도록 lock 걸어주는 객체
         ProcessLock sharedLock = new ProcessLock();
+        //플레이어와 ai의 카드 결정을 저장하는 int 배열 size는 3
         int[] player1OP = null, ai1OP = null, player2OP = null, ai2OP = null;
+        //현재 턴
         int turn = 0;
 
-        //test for getCardFromDeck and Mulligan, show player's hand methods
+        //플레이어의 패를 보여주고 멀리건을 실행
         System.out.println("---Player 1's hand---");
         gs.player1.show();
         gs.player1.mulligan();
         if (mode) {
+            //2대2 모드면 플레이어2도 현재 패를 보여주고 멀리건을 실행
             System.out.println("---Player 2's hand----");
             gs.player2.show();
             gs.player2.mulligan();
         }
+        //현재 게임 상태를 그려주는 함수 (UI 추가되면 없어도됨, ai 디버깅용
         gs.showStatus(turn++);
-        //Test for turn playing
+
+        //게임이 끝날때 까지 while을 돌린다.
         while (!gs.checkGameEnded()) {
+            //플레이어와 ai의 카드 선택을 결정하는 thread 생성.
             PlayerProcess PlayerDecision = null;
             AIProcess AIDecision = null;
+            //플레이어 1의 체력이 0보다 크면 선택을 결정한다.
             if (gs.player1.hp > 0) {
                 PlayerDecision = new PlayerProcess(0, sharedLock);
                 player1OP = PlayerDecision.call();
             }
+            //ai1의 체력이 0보다 크면 선택을 결정한다.
             if (gs.ai1.hp > 0) {
                 AIDecision = new AIProcess(2, sharedLock);
                 ai1OP = AIDecision.call();
             }
+            //2대2 모드고 플레이어 2의 체력이 0보다 크면 결정.
             if (mode && gs.player2.hp > 0) {
                 PlayerDecision = new PlayerProcess(1, sharedLock);
                 player2OP = PlayerDecision.call();
@@ -121,6 +133,7 @@ public class GameSystem {
                 AIDecision = new AIProcess(3, sharedLock);
                 ai2OP = AIDecision.call();
             }
+            if (ai1OP == null) ai1OP = new int[]{-1, -1, -1};
             //Player's card operation
             System.out.printf("Player 1's OP: %d %d %d\n", player1OP[0], player1OP[1], player1OP[2]);
             if (mode) System.out.printf("Player 2's OP: %d %d %d\n", player2OP[0], player2OP[1], player2OP[2]);
@@ -135,15 +148,16 @@ public class GameSystem {
             gs.showStatus(turn++);
             System.out.println();
         }
-        if(mode) {
-            if (gs.player1.hp <= 0 && gs.player2.hp <= 0) System.out.println("AI WIN");
-            else if (gs.ai1.hp <= 0 && gs.ai2.hp <= 0) System.out.println("Player WIN");
-            else System.out.println("Draw..");
-        }
-        else{
-            if(gs.player1.hp<=0) System.out.println("AI WIN");
-            else if(gs.ai1.hp<=0) System.out.println("Player WIN");
-            else System.out.println("Draw..");
+        if (mode) {
+            if (gs.player1.hp <= 0 && gs.player2.hp <= 0) {
+                if (gs.ai1.hp <= 0 && gs.ai2.hp <= 0) System.out.println("Draw..");
+                else System.out.println("AI WIN");
+            } else if (gs.ai1.hp <= 0 && gs.ai2.hp <= 0) System.out.println("Player WIN");
+        } else {
+            if (gs.player1.hp <= 0) {
+                if (gs.ai1.hp <= 0) System.out.println("Draw..");
+                else System.out.println("AI WIN");
+            } else if (gs.ai1.hp <= 0) System.out.println("Player WIN");
         }
     }
 
@@ -158,7 +172,7 @@ public class GameSystem {
                         if (k < 2) {
                             str = gs.getInput("Submit (y,x) to use XVII: The Star\n");
                             StarPoint[k] = StringUtils.Split2Int(str, ",");
-                            if(StarPoint[k]==null){
+                            if (StarPoint[k] == null) {
                                 --k;
                                 continue;
                             }
@@ -174,7 +188,7 @@ public class GameSystem {
                         if (k == 0) {
                             str = gs.getInput("Submit (y,x) to use XVII: The Star\n");
                             StarPoint[k] = StringUtils.Split2Int(str, ",");
-                            if(StarPoint[k]==null){
+                            if (StarPoint[k] == null) {
                                 --k;
                                 continue;
                             }
@@ -202,7 +216,7 @@ public class GameSystem {
                         System.out.printf("Player 2's %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 2 && ai1.hand[0] && Math.random() < 0.15) {
                         pOP[k][i] = 6;
-                        System.out.printf ("AI 1's %dth card was changed by FOOL CARD\n", i + 1);
+                        System.out.printf("AI 1's %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 3 && ai2.hand[0] && Math.random() < 0.15) {
                         pOP[k][i] = 6;
                         System.out.printf("AI 2's %dth card was changed by FOOL CARD\n", i + 1);
