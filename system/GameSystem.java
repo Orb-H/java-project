@@ -181,24 +181,24 @@ public class GameSystem {
             for (int k = 0; k < pOP.length; ++k) {
                 if (mode) {
                     if (k == 0 && player1.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf("Player 1's %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 1 && player2.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf("Player 2's %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 2 && ai1.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf ("AI 1's %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 3 && ai2.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf("AI 2's %dth card was changed by FOOL CARD\n", i + 1);
                     }
                 } else {
                     if (k == 0 && player1.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf("Player %dth card was changed by FOOL CARD\n", i + 1);
                     } else if (k == 1 && ai1.hand[0] && Math.random() < 0.15) {
-                        pOP[k][i] = 0;
+                        pOP[k][i] = 6;
                         System.out.printf("AI %dth card was changed by FOOL CARD\n", i + 1);
                     }
                 }
