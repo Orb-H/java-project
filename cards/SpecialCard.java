@@ -17,8 +17,8 @@ public class SpecialCard extends Card {
         if (super.number == 16) {
             return dx == 0;
         }
-        if(super.number==17){
-            return dy==0 && dx==0;
+        if (super.number == 17) {
+            return dy == 0 && dx == 0;
         }
         return true;
     }
@@ -40,7 +40,7 @@ public class SpecialCard extends Card {
                     if (number != 0) ai[i].cnt_def++;
                 }
             }
-            ply.mp -= cost;
+            ply.mp = (ply.mp - cost > 100) ? 100 : ply.mp - cost;
             if (number != 0) ply.cnt_atk++;
         } else {
             AI ai = GameSystem.gs.getAI(caster);
@@ -57,12 +57,12 @@ public class SpecialCard extends Card {
                     if (number != 0) ply[i].cnt_def++;
                 }
             }
-            ai.mp -= cost;
+            ai.mp = (ai.mp - cost > 100) ? 100 : ai.mp - cost;
             if (number != 0) ai.cnt_atk++;
         }
     }
 
-    public void act(int caster, int sy, int sx){
+    public void act(int caster, int sy, int sx) {
         if (caster < 2) {
             Player ply = GameSystem.gs.getPlayer(caster);
             AI[] ai;

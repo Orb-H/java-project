@@ -51,7 +51,12 @@ public class StringUtils {
 		String[] temp = str.split(token);
 		int[] arr = new int[temp.length];
 		for (int i = 0; i < temp.length; ++i) {
-			arr[i] = Integer.parseInt(temp[i]);
+			try {
+				arr[i] = Integer.parseInt(temp[i]);
+			}catch (NumberFormatException ex){
+				System.out.println("Wrong Format Please Check your input string");
+				return null;
+			}
 		}
 		return arr;
 	}

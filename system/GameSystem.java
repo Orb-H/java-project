@@ -158,6 +158,10 @@ public class GameSystem {
                         if (k < 2) {
                             str = gs.getInput("Submit (y,x) to use XVII: The Star\n");
                             StarPoint[k] = StringUtils.Split2Int(str, ",");
+                            if(StarPoint[k]==null){
+                                --k;
+                                continue;
+                            }
                         } else {
                             double ch = Math.random();
                             if (ch < 0.2) StarPoint[k] = new int[]{player1.y, player1.x + 1};
@@ -170,6 +174,10 @@ public class GameSystem {
                         if (k == 0) {
                             str = gs.getInput("Submit (y,x) to use XVII: The Star\n");
                             StarPoint[k] = StringUtils.Split2Int(str, ",");
+                            if(StarPoint[k]==null){
+                                --k;
+                                continue;
+                            }
                         } else {
                             double ch = Math.random();
                             if (ch < 0.2) StarPoint[k] = new int[]{player1.y, player1.x + 1};

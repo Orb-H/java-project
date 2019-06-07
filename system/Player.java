@@ -52,28 +52,35 @@ public class Player {
                 errCode=0;
                 String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
                 int[] removedCard = StringUtils.Split2Int(inputStr, " ");
+                if(removedCard==null) continue;
                 //Verifying removed card list
                 for (int i = 0; i < removedCard.length - 1; ++i)
                     for (int j = i + 1; j < removedCard.length; ++j)
                         if (removedCard[i] == removedCard[j]) {
                             System.out.println("You cannot remove the same card more than once");
                             errCode = 4;
+                            break;
                         }
                 for (int i = 0; i < removedCard.length && errCode == 0; ++i) {
                     if (removedCard[i] == 0) {
                         System.out.println("You cannot remove \"0: The Fool card\" : Player Mulligan Error");
                         errCode = 2;
+                        break;
                     } else if (removedCard[i] > 24 || removedCard[i] < 0) {
                         System.out.println("Card number should be in bound of 0-23 : Player Mulligan Error");
                         errCode = 3;
+                        break;
                     } else if (!hand[removedCard[i]]) {
                         System.out.printf("You don't have %d card in your hand : Player Mulligan Error\n", removedCard[i]);
                         errCode = 1;
+                        break;
                     }
                 }
-                getCardFromDeck(removedCard.length);
-                for (int i = 0; i < removedCard.length; ++i)
-                    hand[removedCard[i]] = false;
+                if(errCode==0) {
+                    getCardFromDeck(removedCard.length);
+                    for (int i = 0; i < removedCard.length; ++i)
+                        hand[removedCard[i]] = false;
+                }
             } while (errCode != 0);
             System.out.println("Result of Mulligan");
             show();

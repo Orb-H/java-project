@@ -194,35 +194,18 @@ public class AIProcess implements Callable<int[]> {
         }
 
         if (dist == 0) {
-            if (chance < 0.125) return new int[]{left, 2, 5};
-            if (chance < 0.25) return new int[]{left, 3, 5};
-            if (chance < 0.375) return new int[]{right, 2, 5};
-            if (chance < 0.5) return new int[]{right, 3, 5};
-            if (chance < 0.625) return new int[]{2, left, 5};
-            if (chance < 0.75) return new int[]{2, right, 5};
-            if (chance < 0.875) return new int[]{3, left, 5};
-            if (chance < 1) return new int[]{3, right, 5};
+            return new int[] {4, 5, (int)(chance*4)};
         }
         if (dist == 1) {
             if (dy == 0) {
-                if (dx == -1) {
-                    if (chance < 0.5) return new int[]{left, 2, 5};
-                    if (chance < 1) return new int[]{left, 3, 5};
-                }
-                if (chance < 0.5) return new int[]{right, 2, 5};
-                if (chance < 1) return new int[]{right, 3, 5};
+                if (dx == -1) return new int[]{left, 4, 5};
+                return new int[]{right, 4, 5};
             }
             if (dy == -1) {
-                if (chance < 0.25) return new int[]{right, 4, 5};
-                if (chance < 0.5) return new int[]{left, 4, 5};
-                if (chance < 0.75) return new int[]{right, 3, 5};
-                if (chance < 1) return new int[]{left, 3, 5};
+                return new int[]{2, 4, 5};
             }
             if (dy == 1) {
-                if (chance < 0.25) return new int[]{1, 4, 5};
-                if (chance < 0.5) return new int[]{0, 4, 5};
-                if (chance < 0.75) return new int[]{1, 2, 5};
-                if (chance < 1) return new int[]{0, 2, 5};
+                return new int[]{3, 4, 5};
             }
         }
         if (dy < 0 && dx > 0) {
@@ -241,7 +224,7 @@ public class AIProcess implements Callable<int[]> {
             if (chance < 0.5) return new int[]{0, 2, (ai.mp > 90) ? 4 : 5};
             if (chance < 1) return new int[]{2, 0, (ai.mp > 90) ? 4 : 5};
         }
-        System.out.println("System AI Avoid Error");
+        System.out.println("System AI Close Error");
         return null;
     }
 
