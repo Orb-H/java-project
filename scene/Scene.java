@@ -23,7 +23,7 @@ public abstract class Scene {
 	public void render() {
 		sm.clearScreen();
 		for (int i = 0; i < toRender.length; i++) {
-			System.out.println(toRender[i]);
+			System.out.println(StringUtils.alignedToString(toRender[i]));
 		}
 	}
 
@@ -33,6 +33,12 @@ public abstract class Scene {
 
 	public void deleteComponent(Component c) {
 		components.remove(c);
+	}
+
+	public void resize(int x, int y) {
+		toRender = new char[y][x];
+		deleteComponent(components.get(0));
+		components.add(0, new BorderComponent(0, 0, x, y));
 	}
 
 	public void repaint() {

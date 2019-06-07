@@ -44,43 +44,49 @@ public class Player {
         return cost / 4;
     }
 
-    public int mulligan() {
-        String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
-        int[] removedCard = StringUtils.Split2Int(inputStr, " ");
-        //Verifying removed card list
-        for (int i = 0; i < removedCard.length - 1; ++i)
-            for (int j = i + 1; j < removedCard.length; ++j)
-                if (removedCard[i] == removedCard[j]) {
-                    System.out.println("You cannot remove the same card more than once");
-                    return 4;
+    public void mulligan() {
+        int errCode = 0;
+        String b = GameSystem.gs.getInput("mulligan true/false : ");
+        if (b.equals("true") || b.equals("True") || b.equals("TRUE") || b.equals("t") || b.equals("T")) {
+            do {
+                String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
+                int[] removedCard = StringUtils.Split2Int(inputStr, " ");
+                //Verifying removed card list
+                for (int i = 0; i < removedCard.length - 1; ++i)
+                    for (int j = i + 1; j < removedCard.length; ++j)
+                        if (removedCard[i] == removedCard[j]) {
+                            System.out.println("You cannot remove the same card more than once");
+                            errCode = 4;
+                        }
+                for (int i = 0; i < removedCard.length && errCode == 0; ++i) {
+                    if (removedCard[i] == 0) {
+                        System.out.println("You cannot remove \"0: The Fool card\" : Player Mulligan Error");
+                        errCode = 2;
+                    } else if (removedCard[i] > 24 || removedCard[i] < 0) {
+                        System.out.println("Card number should be in bound of 0-23 : Player Mulligan Error");
+                        errCode = 3;
+                    } else if (!hand[removedCard[i]]) {
+                        System.out.printf("You don't have %d card in your hand : Player Mulligan Error\n", removedCard[i]);
+                        errCode = 1;
+                    }
                 }
-        for (int i = 0; i < removedCard.length; ++i) {
-            if (removedCard[i] == 0) {
-                System.out.println("You cannot remove \"0: The Fool card\" : Player Mulligan Error");
-                return 2;
-            }
-            if (removedCard[i] > 24 || removedCard[i] < 0) {
-                System.out.println("Card number should be in bound of 0-23 : Player Mulligan Error");
-                return 3;
-            }
-            if (!hand[removedCard[i]]) {
-                System.out.printf("You don't have %d card in your hand : Player Mulligan Error\n", removedCard[i]);
-                return 1;
-            }
+                getCardFromDeck(removedCard.length);
+                for (int i = 0; i < removedCard.length; ++i)
+                    hand[removedCard[i]] = false;
+            } while (errCode != 0);
+            System.out.println("Result of Mulligan");
+            show();
+            System.out.println();
         }
-
-        getCardFromDeck(removedCard.length);
-        for (int i = 0; i < removedCard.length; ++i)
-            hand[removedCard[i]] = false;
-        return 0;
     }
 
     public void show() {
         System.out.println("Your Hand is");
         for (int i = 0; i < 24; ++i) {
             if (hand[i]) {
-                System.out.println(Card.cards.get(i + 6).getName());
+                System.out.print(Card.cards.get(i + 6).getName()+ "/ ");
             }
         }
+        System.out.println();
     }
 }

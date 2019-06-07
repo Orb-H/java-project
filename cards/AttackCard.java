@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import project.util.Point;
-import project.system.GameSystem;
+import project.system.*;
 
 public class AttackCard extends Card {
 
@@ -22,23 +22,37 @@ public class AttackCard extends Card {
     @Override
     public void act(int caster) {
         int dmg;
-        if (caster == 1) {
-            if (inBound(GameSystem.player.y - GameSystem.ai.y, GameSystem.player.x - GameSystem.ai.x)) {
-                dmg = deal + GameSystem.player.shield;
-                GameSystem.player.hp -= dmg > 0 ? dmg : 0;
-                GameSystem.player.cnt_def++;
-            }
-            GameSystem.ai.mp -= cost;
-            GameSystem.ai.cnt_atk++;
+        Player[] ply;
+        AI[] ai;
+        if (GameSystem.mode) {
+            ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
+            ai = new AI[]{GameSystem.gs.getAI(2), GameSystem.gs.getAI(3)};
         } else {
-            if (inBound(GameSystem.ai.y - GameSystem.player.y, GameSystem.ai.x - GameSystem.player.x)) {
-                dmg = deal + GameSystem.ai.shield;
-                GameSystem.ai.hp -= dmg > 0 ? dmg : 0;
-                GameSystem.ai.cnt_def++;
+            ply = new Player[]{GameSystem.gs.getPlayer(0)};
+            ai = new AI[]{GameSystem.gs.getAI(2)};
+        }
+        if (caster < 2) {
+            for (int i = 0; i < ai.length; ++i) {
+                if (inBound(ai[i].y - ply[caster].y, ai[i].x - ply[caster].x)) {
+                    dmg = deal + ai[i].shield;
+                    ai[i].hp -= dmg > 0 ? dmg : 0;
+                    ai[i].cnt_def++;
+                }
             }
-            GameSystem.player.mp -= cost;
-            GameSystem.player.cnt_atk++;
+            ply[caster].mp -= cost;
+            ply[caster].cnt_atk++;
+        } else {
+            for (int i = 0; i < ply.length; ++i) {
+                if (inBound(ply[i].y - ai[caster - 2].y, ply[i].x - ai[caster - 2].x)) {
+                    dmg = deal + ply[i].shield;
+                    ply[i].hp -= dmg > 0 ? dmg : 0;
+                    ply[i].cnt_def++;
+                }
+            }
+            ai[caster - 2].mp -= cost;
+            ai[caster - 2].cnt_atk++;
         }
     }
 
+    public void act(int caster, int sy, int sx){}
 }

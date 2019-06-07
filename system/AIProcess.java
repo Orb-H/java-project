@@ -7,79 +7,118 @@ import project.util.StringUtils;
 
 public class AIProcess implements Callable<int[]> {
     ProcessLock Lock;
+    int plyInfo;
+    AI ai;
+    Player[] ply;
+
+    public AIProcess(int ainum, ProcessLock b) {
+        Lock = b;
+        plyInfo = ainum;
+    }
 
     public int[] call() {
         //busy waiting
         while (Lock.checkAILock()) ;
-        if (!GameSystem.mode) {
-            switch (GameSystem.ai.stage) {
-                case 1:
-                    Lock.EndAITurn();
-                    return Stage1AI();
-                case 2:
-                    Lock.EndAITurn();
-                    return Stage2AI();
-                case 3:
-                    Lock.EndAITurn();
-                    return Stage3AI();
-            }
+        ai = GameSystem.gs.getAI(plyInfo);
+        if (GameSystem.mode) {
+            ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
+        } else {
+            ply = new Player[]{GameSystem.gs.getPlayer(0)};
+        }
+        switch (ai.stage) {
+            case 1:
+                Lock.EndAITurn();
+                return Stage1AI();
+            case 2:
+                Lock.EndAITurn();
+                return Stage2AI();
+            case 3:
+                Lock.EndAITurn();
+                return Stage3AI();
         }
         System.out.println("Wrong Stage Value : AI Process Error");
         return null;
     }
 
     protected int[] Stage1AI() {
-        double averageCost = 0;
+        int[][] op1, op2 = {{-1}, null};
         //change non-attack cards
-        GameSystem.ai.mulligan(new int[]{7, 10, 17, 19, 21, 22, 23});
-        averageCost = GameSystem.ai.calcavgCost();
-        if (GameSystem.ai.mp < averageCost)
+        ai.mulligan(new int[]{10, 17, 19, 21, 22, 23});
+        if (ai.mp < ai.calcavgCost())
             return Avoid(false, false, false);
-        return CalcMaxDmg();
+        op1 = CalcMaxDmg(ply[0].y, ply[0].x);
+        if (GameSystem.mode) op2 = CalcMaxDmg(ply[1].y, ply[1].x);
+        return op1[0][0] > op2[0][0] ? op1[1] : op2[1];
     }
 
     protected int[] Stage2AI() {
-        double averageCost = 0;
-        int predict, benefit, t = 0;
-        int[] op;
+        int predict1, predict2 = 0, benefit;
+        int[][] op1, op2 = {{-1}, null};
         //change non-attack cards
-        GameSystem.ai.mulligan(new int[]{7, 10, 17, 19, 21, 22, 23});
-        averageCost = GameSystem.ai.calcavgCost();
-        if (GameSystem.ai.mp < averageCost)
+        ai.mulligan(new int[]{10, 17, 19, 21, 22, 23});
+        if (ai.mp < ai.calcavgCost())
             return Avoid(false, false, false);
-        predict = PredictMaxDmg(GameSystem.ai.predictedHand, GameSystem.ai.y - GameSystem.player.y, GameSystem.ai.x - GameSystem.player.x);
-        op = CalcMaxDmg();
-        if(op==null) System.out.println("***********null op was returned");
-        for (int i = 0; i < 3; ++i) t += Card.cards.get(op[i]).getDeal();
-        benefit = t - predict;
+        predict1 = PredictMaxDmg(ai.predictedHand1, 0);
+        op1 = CalcMaxDmg(ply[0].y, ply[0].x);
+        if (GameSystem.mode) {
+            op2 = CalcMaxDmg(ply[1].y, ply[1].x);
+            predict2 = PredictMaxDmg(ai.predictedHand2, 1);
+        }
+
+        benefit = op1[0][0] - predict1;
+        if (GameSystem.mode) benefit = benefit + op2[0][0] - predict2;
+
         if (benefit < 0) return Avoid(false, false, false);
-        return op;
+
+        if (op1[0][0] > op2[0][0]) {
+            return op1[1] != null ? op1[1] : Avoid(false, false, false);
+        } else {
+            return op2[1] != null ? op2[1] : Avoid(false, false, false);
+        }
     }
 
     protected int[] Stage3AI() {
-        double averageCost = 0;
-        int predict, benefit, t = 0;
-        int[] op;
-        GameSystem.ai.mulligan(new int[]{7});
-        averageCost = GameSystem.ai.calcavgCost();
-        if (GameSystem.ai.mp < averageCost)
-            return Avoid(GameSystem.ai.hand[19], GameSystem.ai.hand[22], GameSystem.ai.hand[23]);
-        predict = PredictMaxDmg(GameSystem.ai.predictedHand, GameSystem.ai.y - GameSystem.player.y, GameSystem.ai.x - GameSystem.player.x);
-        if (predict == 0) predict = 25;
-        op = CalcMaxDmg();
-        if (op == null) return Avoid(GameSystem.ai.hand[19], GameSystem.ai.hand[22], GameSystem.ai.hand[23]);
-        for (int i = 0; i < 3; ++i) t += Card.cards.get(op[i]).getDeal();
-        if (t == 0 && GameSystem.ai.mp - GameSystem.player.mp > 40)
-            return Close(GameSystem.ai.hand[22], GameSystem.ai.hand[23]);
-        benefit = t - predict;
-        if (benefit < 0) return Avoid(GameSystem.ai.hand[19], GameSystem.ai.hand[22], GameSystem.ai.hand[23]);
-        return op;
+        int predict1 = 0, predict2 = 0, benefit;
+        int[][] op1 = {{0}, null}, op2 = {{0}, null};
+        ai.mulligan(new int[]{6});
+        if (ai.mp < ai.calcavgCost())
+            return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
+        if (ply[0].hp > 0) {
+            predict1 = PredictMaxDmg(ply[0].hand, 0);
+            op1 = CalcMaxDmg(ply[0].y, ply[0].x);
+        }
+        if (GameSystem.mode && ply[1].hp > 0) {
+            op2 = CalcMaxDmg(ply[1].y, ply[1].x);
+            predict2 = PredictMaxDmg(ply[1].hand, 1);
+        }
+        benefit = op1[0][0] - predict1;
+        if (GameSystem.mode) benefit = benefit + op2[0][0] - predict2;
+        if (benefit < 0) return Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
+
+        if (op1[0][0] == 0 && op2[0][0] == 0 && ai.mp > 80) return Close(ai.hand[22], ai.hand[23]);
+
+        if (op1[0][0] > op2[0][0]) {
+            return (op1[1] != null) ? op1[1] : Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
+        } else {
+            return (op2[1] != null) ? op2[1] : Avoid(ai.hand[19], ai.hand[22], ai.hand[23]);
+        }
     }
 
     protected int[] Avoid(boolean hasHeal, boolean hasLDash, boolean hasRDash) {
-        int dy = GameSystem.ai.y - GameSystem.player.y, dx = GameSystem.ai.x - GameSystem.player.x;
-        int dist = Math.abs(dy) + Math.abs(dx), right = (hasRDash ? 29 : 1), left = (hasLDash ? 28 : 0);
+        int tmp, dist, dy, dx;
+        int right = (hasRDash ? 29 : 1), left = (hasLDash ? 28 : 0);
         double chance = Math.random();
+        dist = Math.abs(ply[0].y - ai.y) + Math.abs(ply[0].x - ai.x);
+        dy = ai.y - ply[0].y;
+        dx = ai.x - ply[0].x;
+        if (GameSystem.mode) {
+            tmp = Math.abs(ply[1].y - ai.y) + Math.abs(ply[1].x - ai.x);
+            if (dist > tmp) {
+                dist = tmp;
+                dy = ai.y - ply[1].y;
+                dx = ai.x - ply[1].x;
+            }
+        }
         if (dist == 0) {
             if (chance < 0.125) return new int[]{left, 2, 5};
             if (chance < 0.25) return new int[]{left, 3, 5};
@@ -114,36 +153,48 @@ public class AIProcess implements Callable<int[]> {
         }
         if (dy < 0 && dx > 0) {
             if (chance < 0.5)
-                return new int[]{1, 2, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{1, 2, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
             if (chance < 1)
-                return new int[]{2, 1, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{2, 1, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
         }
         if (dy >= 0 && dx > 0) {
             if (chance < 0.5)
-                return new int[]{1, 3, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{1, 3, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
             if (chance < 1)
-                return new int[]{3, 1, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{3, 1, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
         }
         if (dy >= 0 && dx <= 0) {
             if (chance < 0.5)
-                return new int[]{0, 3, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{0, 3, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
             if (chance < 1)
-                return new int[]{3, 0, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{3, 0, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
         }
         if (dy < 0 && dx <= 0) {
             if (chance < 0.5)
-                return new int[]{0, 2, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{0, 2, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
             if (chance < 1)
-                return new int[]{2, 0, (GameSystem.ai.hp < 70 && GameSystem.ai.mp > 60 && hasHeal) ? 25 : 5};
+                return new int[]{2, 0, (ai.hp < 70 && ai.mp > 60 && hasHeal) ? 25 : 5};
         }
         System.out.println("System AI Avoid Error");
         return null;
     }
 
     protected int[] Close(boolean hasLDash, boolean hasRDash) {
-        int dy = GameSystem.ai.y - GameSystem.player.y, dx = GameSystem.ai.x - GameSystem.player.x;
-        int dist = Math.abs(dy) + Math.abs(dx), right = (hasRDash ? 29 : 1), left = (hasLDash ? 28 : 0);
+        int tmp, dist, dy, dx;
+        int right = (hasRDash ? 29 : 1), left = (hasLDash ? 28 : 0);
         double chance = Math.random();
+        dist = Math.abs(ply[0].y - ai.y) + Math.abs(ply[0].x - ai.x);
+        dy = ply[0].y - ai.y;
+        dx = ply[0].x - ai.x;
+        if (GameSystem.mode) {
+            tmp = Math.abs(ply[1].y - ai.y) + Math.abs(ply[1].x - ai.x);
+            if (dist > tmp) {
+                dist = tmp;
+                dy = ply[1].y - ai.y;
+                dx = ply[1].x - ai.x;
+            }
+        }
+
         if (dist == 0) {
             if (chance < 0.125) return new int[]{left, 2, 5};
             if (chance < 0.25) return new int[]{left, 3, 5};
@@ -177,20 +228,20 @@ public class AIProcess implements Callable<int[]> {
             }
         }
         if (dy < 0 && dx > 0) {
-            if (chance < 0.5) return new int[]{1, 2, (GameSystem.ai.mp > 90) ? 4 : 5};
-            if (chance < 1) return new int[]{2, 1, (GameSystem.ai.mp > 90) ? 4 : 5};
+            if (chance < 0.5) return new int[]{1, 2, (ai.mp > 90) ? 4 : 5};
+            if (chance < 1) return new int[]{2, 1, (ai.mp > 90) ? 4 : 5};
         }
         if (dy >= 0 && dx > 0) {
-            if (chance < 0.5) return new int[]{1, 3, (GameSystem.ai.mp > 90) ? 4 : 5};
-            if (chance < 1) return new int[]{3, 1, (GameSystem.ai.mp > 90) ? 4 : 5};
+            if (chance < 0.5) return new int[]{1, 3, (ai.mp > 90) ? 4 : 5};
+            if (chance < 1) return new int[]{3, 1, (ai.mp > 90) ? 4 : 5};
         }
         if (dy >= 0 && dx <= 0) {
-            if (chance < 0.5) return new int[]{0, 3, (GameSystem.ai.mp > 90) ? 4 : 5};
-            if (chance < 1) return new int[]{3, 0, (GameSystem.ai.mp > 90) ? 4 : 5};
+            if (chance < 0.5) return new int[]{0, 3, (ai.mp > 90) ? 4 : 5};
+            if (chance < 1) return new int[]{3, 0, (ai.mp > 90) ? 4 : 5};
         }
         if (dy < 0 && dx <= 0) {
-            if (chance < 0.5) return new int[]{0, 2, (GameSystem.ai.mp > 90) ? 4 : 5};
-            if (chance < 1) return new int[]{2, 0, (GameSystem.ai.mp > 90) ? 4 : 5};
+            if (chance < 0.5) return new int[]{0, 2, (ai.mp > 90) ? 4 : 5};
+            if (chance < 1) return new int[]{2, 0, (ai.mp > 90) ? 4 : 5};
         }
         System.out.println("System AI Avoid Error");
         return null;
@@ -201,7 +252,7 @@ public class AIProcess implements Callable<int[]> {
         int chance;
         int[] op = new int[3];
         chk[0] = chk[1] = chk[2] = chk[3] = false;
-        if (GameSystem.ai.mp == 100) {
+        if (ai.mp == 100) {
             for (int i = 0; i < 3; ++i) {
                 do {
                     chance = (int) (Math.random() * 4);
@@ -222,27 +273,24 @@ public class AIProcess implements Callable<int[]> {
         return op;
     }
 
-    protected int[] CalcMaxDmg() {
-        int col = GameSystem.ai.mp / 5, dy = GameSystem.player.y - GameSystem.ai.y, dx = GameSystem.player.x - GameSystem.ai.x, r = 0;
+    protected int[][] CalcMaxDmg(int ty, int tx) {
+        int col = ai.mp / 5, dy = ty - ai.y, dx = tx - ai.x, r = 0;
         int[] cost = new int[4];
         int[] deal = new int[4];
         int[] idx_card = new int[4];
         int[] op = new int[3];
         int[][] dp;
-        boolean isStar = false;
         String[][] used;
 
         for (int i = 1; i < 24; ++i)
-            if (GameSystem.ai.hand[i] && Card.cards.get(i + 6).inBound(dy, dx))
-                if (i == 17)
-                    isStar = true;
-                else idx_card[r++] = i + 6;
+            if (ai.hand[i] && Card.cards.get(i + 6).inBound(dy, dx))
+                idx_card[r++] = i + 6;
 
         if (r == 0) {
-            if (isStar && GameSystem.ai.mp == 100)
-                return new int[]{17, 4, 5};
+            if (ai.hand[17] && ai.mp == 100)
+                return new int[][]{{0}, {17, 4, 5}};
             else
-                return ranMove();
+                return new int[][]{{0}, ranMove()};
         }
 
 
@@ -275,7 +323,7 @@ public class AIProcess implements Callable<int[]> {
                 }
             }
         }
-        if (used[r - 1][col - 1].equals("")) return null;
+        if (used[r - 1][col - 1].equals("")) return new int[][] {{0}, null};
         int[] temp = StringUtils.Split2Int(used[r - 1][col - 1], " ");
         for (int i = 0; i < temp.length; ++i) op[i] = temp[i];
         if (op[1] == 0) {
@@ -283,11 +331,11 @@ public class AIProcess implements Callable<int[]> {
             op[2] = 5;
         } else if (op[2] == 0)
             op[2] = 5;
-        return op;
+        return new int[][]{{dp[r - 1][col - 1]}, op};
     }
 
-    protected int PredictMaxDmg(boolean[] predict, int dy, int dx) {
-        int col = GameSystem.ai.mp / 5, r = 0;
+    protected int PredictMaxDmg(boolean[] predict, int idx) {
+        int col = ply[idx].mp / 5, dy = ai.y - ply[idx].y, dx = ai.x - ply[idx].x, r = 0;
         int[] cost = new int[4];
         int[] deal = new int[4];
         int[] idx_card = new int[4];
@@ -296,10 +344,8 @@ public class AIProcess implements Callable<int[]> {
         for (int i = 0; i < 24; ++i)
             if (predict[i] && Card.cards.get(i + 6).inBound(dy, dx))
                 idx_card[r++] = i;
-
         if (r == 0)
             return 0;
-
         dp = new int[r][col];
         for (int i = 0; i < r; ++i)
             for (int j = 0; j < col; ++j) {

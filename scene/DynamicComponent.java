@@ -14,4 +14,9 @@ public class DynamicComponent extends Component {
 		setRender(size.getX(), size.getY(), s);
 	}
 
+	public void changeLocation(int x, int y) {
+		loc.setX(x);
+		loc.setY(y);
+	}
+
 }

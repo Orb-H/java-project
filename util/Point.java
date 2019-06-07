@@ -1,6 +1,5 @@
 package project.util;
 
-
 public class Point {
 
     public static final Point x_1y_1 = new Point(-1, -1);
@@ -70,10 +69,10 @@ public class Point {
     }
 
     public boolean equals(Object obj) {
-        if (super.equals(obj)) return true;
+        if (!(obj instanceof Point)) return false;
+        Point tmp = (Point) obj;
         if (obj instanceof Point) {
-            if ((this.x == ((Point) obj).getX()) && (this.y == ((Point) obj).getY()))
-                return true;
+            return (this.x == tmp.getX()) && (this.y == tmp.getY());
         }
         return false;
     }

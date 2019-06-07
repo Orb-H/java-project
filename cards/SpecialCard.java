@@ -1,6 +1,6 @@
 package project.cards;
 
-import project.system.GameSystem;
+import project.system.*;
 
 public class SpecialCard extends Card {
     public SpecialCard(String name, int num, String[] ascii, String description, int deal, int cost) {
@@ -17,33 +17,78 @@ public class SpecialCard extends Card {
         if (super.number == 16) {
             return dx == 0;
         }
+        if(super.number==17){
+            return dy==0 && dx==0;
+        }
         return true;
     }
 
     public void act(int caster) {
         int dmg;
-        if (caster == 1) {
-            if (inBound(GameSystem.player.y - GameSystem.ai.y, GameSystem.player.x - GameSystem.ai.x)) {
-                if (number != 10) {
-                    dmg = deal + GameSystem.player.shield;
-                    if (dmg < 0) dmg = 0;
-                } else dmg = (Math.random() < 0.5 ? 80 : -30);
-                GameSystem.player.hp -= dmg;
-                if(number!=0) GameSystem.player.cnt_def++;
+        if (caster < 2) {
+            Player ply = GameSystem.gs.getPlayer(caster);
+            AI[] ai;
+            if (GameSystem.mode) ai = new AI[]{GameSystem.gs.getAI(2), GameSystem.gs.getAI(3)};
+            else ai = new AI[]{GameSystem.gs.getAI(2)};
+            for (int i = 0; i < ai.length; ++i) {
+                if (inBound(ai[i].y - ply.y, ai[i].x - ply.x)) {
+                    if (number != 10) {
+                        dmg = deal + ai[i].shield;
+                        if (dmg < 0) dmg = 0;
+                    } else dmg = (Math.random() < 0.5 ? 80 : -30);
+                    ai[i].hp -= dmg;
+                    if (number != 0) ai[i].cnt_def++;
+                }
             }
-            GameSystem.ai.mp-=cost;
-            if(number!=0) GameSystem.ai.cnt_atk++;
+            ply.mp -= cost;
+            if (number != 0) ply.cnt_atk++;
         } else {
-            if (inBound(GameSystem.ai.y - GameSystem.player.y, GameSystem.ai.x - GameSystem.player.x)) {
-                if (number != 10) {
-                    dmg = deal + GameSystem.ai.shield;
-                    if (dmg < 0) dmg = 0;
-                } else dmg = (Math.random() < 0.5 ? 80 : -30);
-                GameSystem.ai.hp -= dmg;
-                if(number!=0) GameSystem.ai.cnt_def++;
+            AI ai = GameSystem.gs.getAI(caster);
+            Player[] ply;
+            if (GameSystem.mode) ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
+            else ply = new Player[]{GameSystem.gs.getPlayer(0)};
+            for (int i = 0; i < ply.length; ++i) {
+                if (inBound(ply[i].y - ai.y, ply[i].x - ai.x)) {
+                    if (number != 10) {
+                        dmg = deal + ply[i].shield;
+                        if (dmg < 0) dmg = 0;
+                    } else dmg = (Math.random() < 0.5 ? 80 : -30);
+                    ply[i].hp -= dmg;
+                    if (number != 0) ply[i].cnt_def++;
+                }
             }
-            GameSystem.player.mp-=cost;
-            if(number!=0) GameSystem.player.cnt_atk++;
+            ai.mp -= cost;
+            if (number != 0) ai.cnt_atk++;
+        }
+    }
+
+    public void act(int caster, int sy, int sx){
+        if (caster < 2) {
+            Player ply = GameSystem.gs.getPlayer(caster);
+            AI[] ai;
+            if (GameSystem.mode) ai = new AI[]{GameSystem.gs.getAI(2), GameSystem.gs.getAI(3)};
+            else ai = new AI[]{GameSystem.gs.getAI(2)};
+            for (int i = 0; i < ai.length; ++i) {
+                if (inBound(ai[i].y - sy, ai[i].x - sx)) {
+                    ai[i].hp -= deal;
+                    ai[i].cnt_def++;
+                }
+            }
+            ply.mp -= cost;
+            ply.cnt_atk++;
+        } else {
+            AI ai = GameSystem.gs.getAI(caster);
+            Player[] ply;
+            if (GameSystem.mode) ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
+            else ply = new Player[]{GameSystem.gs.getPlayer(0)};
+            for (int i = 0; i < ply.length; ++i) {
+                if (inBound(ply[i].y - sy, ply[i].x - sx)) {
+                    ply[i].hp -= deal;
+                    ply[i].cnt_def++;
+                }
+            }
+            ai.mp -= cost;
+            ai.cnt_atk++;
         }
     }
 }

@@ -2,27 +2,36 @@ package project.system;
 
 import java.util.concurrent.Callable;
 import java.util.Scanner;
+
 import project.cards.*;
 
 public class PlayerProcess implements Callable<int[]> {
     ProcessLock Lock;
+    int plyInfo;
+
+    public PlayerProcess(int plynum, ProcessLock b) {
+        plyInfo = plynum;
+        Lock = b;
+    }
 
     public int[] call() {
         //busy waiting
-        while (Lock.checkPlayerLock()) ;
+        while (Lock.checkPlayerLock() && Lock.checkWrite()) ;
+        Lock.DoWrite();
         Scanner scanner = new Scanner(System.in);
         boolean done = false;
         int[] op = new int[3];
         int estimate_cost;
         String input;
         String[] op_string;
-
+        Player ply = GameSystem.gs.getPlayer(plyInfo);
         //Show current hand
-        GameSystem.player.show();
+        System.out.printf("Player %d's hand\n", plyInfo + 1);
+        ply.show();
         System.out.println("Left -> L, Right -> R, Up -> U, Down -> D, Guard -> G, Charge -> C");
         do {
-            estimate_cost=0;
-            System.out.print("Choose order of Cards ; ");
+            estimate_cost = 0;
+            System.out.print("Choose order of Cards : ");
             input = scanner.nextLine();
             op_string = input.split(" ");
             if (op_string.length != 3) {
@@ -39,11 +48,10 @@ public class PlayerProcess implements Callable<int[]> {
                 else if (op_string[i].equals("U") || op_string[i].equals("u")) op[i] = 2;
                 else if (op_string[i].equals("D") || op_string[i].equals("d")) op[i] = 3;
                 else if (op_string[i].equals("G") || op_string[i].equals("g")) op[i] = 4;
-                else if (op_string[i].equals("C") || op_string[i].equals("c")){
+                else if (op_string[i].equals("C") || op_string[i].equals("c")) {
                     op[i] = 5;
-                    estimate_cost-=15;
-                }
-                else {
+                    estimate_cost -= 15;
+                } else {
                     try {
                         op[i] = Integer.parseInt(op_string[i]);
                     } catch (NumberFormatException ex) {
@@ -51,9 +59,9 @@ public class PlayerProcess implements Callable<int[]> {
                         break;
                     }
                     try {
-                        if (GameSystem.player.hand[op[i]]) {
+                        if (ply.hand[op[i]]) {
                             op[i] += 6;
-                            estimate_cost+=Card.cards.get(op[i]).getCost();
+                            estimate_cost += Card.cards.get(op[i]).getCost();
                         } else {
                             System.out.println("Not in your hand error");
                             break;
@@ -63,16 +71,16 @@ public class PlayerProcess implements Callable<int[]> {
                         break;
                     }
                 }
-                if (i == 2){
-                    if(estimate_cost>GameSystem.player.mp){
-                        System.out.println("Not enough mp");
-                        break;
-                    }
-                    else done=true;
+                if (estimate_cost > ply.mp) {
+                    System.out.println("Not enough mp");
+                    break;
                 }
+                if (i == 2) done = true;
             }
         } while (!done);
         Lock.EndPlayerTurn();
+        Lock.EndWrite();
         return op;
     }
+
 }

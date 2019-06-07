@@ -13,7 +13,7 @@ public abstract class Card {
     protected int number; // -1 is Start Cards, others are drafted cards.
     public final CardType type;
     protected String name;
-    protected char[][] ascii;
+    protected String[] ascii;
     protected String description;
     protected final int priority;
 
@@ -24,9 +24,7 @@ public abstract class Card {
         this(type);
         this.name = name;
         this.number = number;
-        for (int i = 0; i < ascii.length; i++) {
-            this.ascii[i] = StringUtils.alignString(ascii[i]);
-        }
+        this.ascii = ascii;
         this.description = description;
         this.deal = deal;
         this.cost = cost;
@@ -115,8 +113,12 @@ public abstract class Card {
         return deal;
     }
 
+    public String[] getAscii() {
+        return ascii;
+    }
+
     public abstract boolean inBound(int dx, int dy);
 
     public abstract void act(int caster);
-
+    public abstract void act(int caster, int sy, int sx);
 }
