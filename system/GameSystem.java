@@ -305,7 +305,7 @@ public class GameSystem {
             System.out.printf("Player 2 = HP: %d, MP: %d ------ AI 2 = HP: %d, MP: %d\n\n", player2.hp, player2.mp, ai2.hp, ai2.mp);
             System.out.printf("Player 2 : y %d, x %d ------ AI 2 : y %d, x %d\n", player2.y, player2.x, ai2.y, ai2.x);
             for (int i = 0; i < 5; ++i) {
-                for (int j = 0; j < 5; ++j) {
+                for (int j = 0; j < 4; ++j) {
                     if (i == player1.y && j == player1.x && player1.hp > 0) System.out.print("P ");
                     else if (i == player2.y && j == player2.x && player2.hp > 0) System.out.print("W ");
                     else if (i == ai1.y && j == ai1.x && ai1.hp > 0) System.out.print("A ");
