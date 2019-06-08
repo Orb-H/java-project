@@ -18,7 +18,7 @@ public class MoveCard extends Card {
     @Override
     public void act(int caster) {
         if (caster < 2) {
-            Player ply = GameSystem.gs.getPlayer(caster);
+            Player ply = gs.getPlayer(caster);
             if (direction == 0 && ply.x > 0) ply.x -= 1;
             else if (direction == 1 && ply.x < 3) ply.x += 1;
             else if (direction == 2 && ply.y > 0) ply.y -= 1;
@@ -26,7 +26,7 @@ public class MoveCard extends Card {
             else if (number == 22 && ply.x > 1) ply.x -= (ply.x == 1 ? 1 : 2);
             else if (number == 23 && ply.x < 3) ply.x += (ply.x == 2) ? 1 : 2;
         } else {
-            AI ai = GameSystem.gs.getAI(caster);
+            AI ai = gs.getAI(caster);
             if (direction == 0 && ai.x > 0) ai.x -= 1;
             else if (direction == 1 && ai.x < 3) ai.x += 1;
             else if (direction == 2 && ai.y > 0) ai.y -= 1;

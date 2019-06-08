@@ -11,12 +11,15 @@ public class Player {
     public int cnt_atk = 0, cnt_def = 0;
     boolean[] hand = new boolean[24];
 
+    protected GameSystem gs;
+
     Player(int sy, int sx) {
         for (int i = 0; i < 24; ++i) hand[i] = false;
         x = sx;
         y = sy;
         hp = mp = 100;
         getCardFromDeck(4);
+        gs=GameSystem.getInstance();
     }
 
     public void getCardFromDeck(int cnt) {
@@ -46,11 +49,11 @@ public class Player {
 
     public void mulligan() {
         int errCode = 0;
-        String b = GameSystem.gs.getInput("mulligan true/false : ");
+        String b = gs.getInput("mulligan true/false : ");
         if (b.equals("true") || b.equals("True") || b.equals("TRUE") || b.equals("t") || b.equals("T")) {
             do {
                 errCode=0;
-                String inputStr = GameSystem.gs.getInput("Submit cards' number to change with ascending order : ");
+                String inputStr = gs.getInput("Submit cards' number to change with ascending order : ");
                 int[] removedCard = StringUtils.Split2Int(inputStr, " ");
                 if(removedCard==null) {
                     errCode=5;

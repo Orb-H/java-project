@@ -25,11 +25,11 @@ public class AttackCard extends Card {
         Player[] ply;
         AI[] ai;
         if (GameSystem.mode) {
-            ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
-            ai = new AI[]{GameSystem.gs.getAI(2), GameSystem.gs.getAI(3)};
+            ply = new Player[]{gs.getPlayer(0), gs.getPlayer(1)};
+            ai = new AI[]{gs.getAI(2), gs.getAI(3)};
         } else {
-            ply = new Player[]{GameSystem.gs.getPlayer(0)};
-            ai = new AI[]{GameSystem.gs.getAI(2)};
+            ply = new Player[]{gs.getPlayer(0)};
+            ai = new AI[]{gs.getAI(2)};
         }
         if (caster < 2) {
             for (int i = 0; i < ai.length; ++i) {

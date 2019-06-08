@@ -14,11 +14,11 @@ public class ShieldCard extends Card {
     @Override
     public void act(int caster) {
         if (caster < 2) {
-            Player ply = GameSystem.gs.getPlayer(caster);
+            Player ply = gs.getPlayer(caster);
             ply.shield = deal;
             ply.mp -= cost;
         } else {
-            AI ai = GameSystem.gs.getAI(caster);
+            AI ai = gs.getAI(caster);
             ai.shield = deal;
             ai.mp -= cost;
         }

@@ -8,10 +8,12 @@ import project.cards.*;
 public class PlayerProcess implements Callable<int[]> {
     ProcessLock Lock;
     int plyInfo;
+    protected GameSystem gs;
 
     public PlayerProcess(int plynum, ProcessLock b) {
         plyInfo = plynum;
         Lock = b;
+        gs=GameSystem.getInstance();
     }
 
     public int[] call() {
@@ -24,7 +26,7 @@ public class PlayerProcess implements Callable<int[]> {
         int estimate_cost;
         String input;
         String[] op_string;
-        Player ply = GameSystem.gs.getPlayer(plyInfo);
+        Player ply = gs.getPlayer(plyInfo);
         //Show current hand
         System.out.printf("Player %d's hand\n", plyInfo + 1);
         ply.show();

@@ -10,20 +10,22 @@ public class AIProcess implements Callable<int[]> {
     int plyInfo;
     AI ai;
     Player[] ply;
+    protected GameSystem gs;
 
     public AIProcess(int ainum, ProcessLock b) {
         Lock = b;
         plyInfo = ainum;
+        gs=GameSystem.getInstance();
     }
 
     public int[] call() {
         //busy waiting
         while (Lock.checkAILock()) ;
-        ai = GameSystem.gs.getAI(plyInfo);
+        ai = gs.getAI(plyInfo);
         if (GameSystem.mode) {
-            ply = new Player[]{GameSystem.gs.getPlayer(0), GameSystem.gs.getPlayer(1)};
+            ply = new Player[]{gs.getPlayer(0), gs.getPlayer(1)};
         } else {
-            ply = new Player[]{GameSystem.gs.getPlayer(0)};
+            ply = new Player[]{gs.getPlayer(0)};
         }
         switch (ai.stage) {
             case 1:

@@ -20,7 +20,7 @@ public class GameSystem {
     private Player player1, player2;
     private AI ai1, ai2;
 
-    public static GameSystem gs;
+    private static GameSystem gs;
     private SceneManager sceneManager;
     private Ranking[] rankings;
 
@@ -272,7 +272,7 @@ public class GameSystem {
         else prio = new int[]{0, 1, 2, 3};
         for (int i = 0; i < op.length - 1; ++i) {
             for (int j = i + 1; j < op.length; ++j) {
-                if (Card.cards.get(op[i]).type.ordinal() > Card.cards.get(op[j]).type.ordinal()) {
+                if (Card.cards.get(op[i]).getPriority() > Card.cards.get(op[j]).getPriority()) {
                     int t = op[i];
                     op[i] = op[j];
                     op[j] = t;

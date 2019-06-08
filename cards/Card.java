@@ -3,6 +3,7 @@ package project.cards;
 import java.util.ArrayList;
 import java.util.List;
 
+import project.system.GameSystem;
 import project.util.Point;
 import project.util.StringUtils;
 
@@ -16,7 +17,7 @@ public abstract class Card {
     protected String[] ascii;
     protected String description;
     protected final int priority;
-
+    protected GameSystem gs;
     protected int deal;
     protected int cost;
 
@@ -28,11 +29,16 @@ public abstract class Card {
         this.description = description;
         this.deal = deal;
         this.cost = cost;
+        gs=GameSystem.getInstance();
     }
 
     private Card(CardType type) {
         this.type = type;
         this.priority = type.ordinal();
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     static {
