@@ -83,11 +83,11 @@ public class GameSystem {
         if (temp.equals("true") || temp.equals("t")) mode = true;
         //ai와 player 객체 생성 기본 설정 3스테이지
         gs.player1 = new Player(1, 0);
-        gs.ai1 = new AI(1, (mode ? 4 : 3), 3);
+        gs.ai1 = new AI(1,  3, 3);
         //2대2 모드면 객체 2개 더 생성
         if (mode) {
             gs.player2 = new Player(3, 0);
-            gs.ai2 = new AI(3, 4, 3);
+            gs.ai2 = new AI(3, 3, 3);
         }
         //플레이어와 ai결정이 같이 끝나도록 lock 걸어주는 객체
         ProcessLock sharedLock = new ProcessLock();
