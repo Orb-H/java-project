@@ -10,6 +10,7 @@ import project.system.AIProcess;
 import project.system.GameSystem;
 import project.system.Player;
 import project.system.PlayerProcess;
+import project.system.ProcessLock;
 import project.util.StringUtils;
 
 public class SelectScene extends Scene {
@@ -151,6 +152,7 @@ public class SelectScene extends Scene {
 			fs.field[player2.y][player2.x].toggleValue(3);
 			fs.field[ai2.y][ai2.x].toggleValue(4);
 		}
+		ProcessLock sharedLock = new ProcessLock();
 		// 플레이어와 ai결정이 같이 끝나도록 lock 걸어주는 객체
 		// 플레이어와 ai의 카드 결정을 저장하는 int 배열 size는 3
 		int[] player1OP = null, ai1OP = null, player2OP = null, ai2OP = null;
@@ -192,27 +194,27 @@ public class SelectScene extends Scene {
 			showCards(player1.getCards());
 			repaint();
 			if (player1.hp > 0) {
-				PlayerDecision = new PlayerProcess(0);
+				PlayerDecision = new PlayerProcess(0, sharedLock);
 				player1OP = PlayerDecision.call();
 				setCards(fs.p1Selected, player1OP);
 				repaint();
 			}
 			// ai1의 체력이 0보다 크면 선택을 결정한다.
 			if (ai1.hp > 0) {
-				AIDecision = new AIProcess(2);
+				AIDecision = new AIProcess(2, sharedLock);
 				ai1OP = AIDecision.call();
 			}
 			// 2대2 모드고 플레이어 2의 체력이 0보다 크면 결정.
 			if (GameSystem.mode && player2.hp > 0) {
 				showCards(player2.getCards());
 				repaint();
-				PlayerDecision = new PlayerProcess(1);
+				PlayerDecision = new PlayerProcess(1, sharedLock);
 				player2OP = PlayerDecision.call();
 				setCards(fs.p2Selected, player2OP);
 				repaint();
 			}
 			if (GameSystem.mode && ai2.hp > 0) {
-				AIDecision = new AIProcess(3);
+				AIDecision = new AIProcess(3, sharedLock);
 				ai2OP = AIDecision.call();
 			}
 			// Player's card operation

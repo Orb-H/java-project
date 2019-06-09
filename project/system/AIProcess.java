@@ -1,24 +1,30 @@
 package project.system;
 
+import java.util.concurrent.Callable;
+
 import project.cards.Card;
 import project.scene.battle.SelectScene;
 import project.util.StringUtils;
 
-public class AIProcess {
+public class AIProcess implements Callable<int[]> {
 
+	ProcessLock Lock;
 	int plyInfo;
 	AI ai;
 	Player[] ply;
 
 	private SelectScene ss;
 
-	public AIProcess(int ainum) {
+	public AIProcess(int ainum, ProcessLock b) {
+		Lock = b;
 		plyInfo = ainum;
 
 		ss = SelectScene.getInstance();
 	}
 
 	public int[] call() {
+		while (Lock.checkAILock())
+			;
 		ai = ss.getAI(plyInfo);
 		if (GameSystem.mode) {
 			ply = new Player[] { ss.getPlayer(0), ss.getPlayer(1) };
@@ -27,10 +33,13 @@ public class AIProcess {
 		}
 		switch (ai.stage) {
 		case 1:
+			Lock.EndAITurn();
 			return Stage1AI();
 		case 2:
+			Lock.EndAITurn();
 			return Stage2AI();
 		case 3:
+			Lock.EndAITurn();
 			return Stage3AI();
 		}
 		System.out.println("Wrong Stage Value : AI Process Error");

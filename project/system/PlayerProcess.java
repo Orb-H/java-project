@@ -1,23 +1,30 @@
 package project.system;
 
+import java.util.concurrent.Callable;
+
 import project.cards.Card;
 import project.scene.battle.SelectScene;
 
-public class PlayerProcess {
+public class PlayerProcess implements Callable<int[]> {
 
+	ProcessLock Lock;
 	int plyInfo;
 
 	private GameSystem gs;
 	private SelectScene ss;
 
-	public PlayerProcess(int plynum) {
+	public PlayerProcess(int plynum, ProcessLock b) {
 		plyInfo = plynum;
+		Lock = b;
 
 		gs = GameSystem.getInstance();
 		ss = SelectScene.getInstance();
 	}
 
 	public int[] call() {
+		while (Lock.checkPlayerLock() && Lock.checkWrite())
+			;
+		Lock.DoWrite();
 		boolean done = false;
 		int[] op = new int[3];
 		int estimate_cost;
@@ -88,6 +95,8 @@ public class PlayerProcess {
 					done = true;
 			}
 		} while (!done);
+		Lock.EndPlayerTurn();
+		Lock.EndWrite();
 		return op;
 	}
 
