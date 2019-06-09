@@ -22,6 +22,15 @@ public class Player {
         gs=GameSystem.getInstance();
     }
 
+    Player(int sy, int sx, boolean[] t_hand){
+        x=sx;
+        y=sy;
+        hp=mp=100;
+        hand=t_hand;
+        getCardFromDeck(1);
+
+    }
+
     public void getCardFromDeck(int cnt) {
         Random gen = new Random();
         int drawCard;

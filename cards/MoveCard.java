@@ -23,7 +23,7 @@ public class MoveCard extends Card {
             else if (direction == 1 && ply.x < 3) ply.x += 1;
             else if (direction == 2 && ply.y > 0) ply.y -= 1;
             else if (direction == 3 && ply.y < (GameSystem.mode ? 4 : 2)) ply.y += 1;
-            else if (number == 22 && ply.x > 1) ply.x -= (ply.x == 1 ? 1 : 2);
+            else if (number == 22 && ply.x > 0) ply.x -= (ply.x == 1 ? 1 : 2);
             else if (number == 23 && ply.x < 3) ply.x += (ply.x == 2) ? 1 : 2;
         } else {
             AI ai = gs.getAI(caster);
@@ -31,7 +31,7 @@ public class MoveCard extends Card {
             else if (direction == 1 && ai.x < 3) ai.x += 1;
             else if (direction == 2 && ai.y > 0) ai.y -= 1;
             else if (direction == 3 && ai.y < (GameSystem.mode ? 4 : 2)) ai.y += 1;
-            else if (number == 22 && ai.x > 1) ai.x -= (ai.x == 1 ? 1 : 2);
+            else if (number == 22 && ai.x > 0) ai.x -= (ai.x == 1 ? 1 : 2);
             else if (number == 23 && ai.x < 3) ai.x += (ai.x == 2 ? 1 : 2);
 
 

@@ -301,9 +301,9 @@ public class GameSystem {
                 star =23카드의 경우 떨어지는 좌표가 필요하므로 StarPoint를 써서 좌표도 같이 받는다.
                 */
                 if (pOP[order[k]][i] == 23)
-                    Card.cards.get(pOP[order[k]][i]).act(order[k], StarPoint[order[k]][0], StarPoint[order[k]][1]);
+                    Card.cards.get(pOP[order[k]][i]).act(mode ? order[k] : 2 * order[k], StarPoint[order[k]][0], StarPoint[order[k]][1]);
                 else
-                    Card.cards.get(pOP[order[k]][i]).act(order[k]);
+                    Card.cards.get(pOP[order[k]][i]).act(mode ? order[k] : 2 * order[k]);
             }
             //플레이어와 ai의 shield는 한페이즈만 적용되므로 값을 다시 0으로 초기화 해준다.
             player1.shield = ai1.shield = 0;
@@ -330,8 +330,8 @@ public class GameSystem {
                     op[0][i] = op[0][j];
                     op[0][j] = t;
                     t = op[1][i];
-                    op[1][i]=op[1][j];
-                    op[1][j]=t;
+                    op[1][i] = op[1][j];
+                    op[1][j] = t;
                 }
             }
         }
